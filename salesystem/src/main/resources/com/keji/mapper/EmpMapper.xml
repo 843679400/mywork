@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.EmpMapper">
+    <resultMap id="empMap" type="Emp">
+        <result column="emp_id" property="empId"/>
+        <result column="emp_number" property="empNumber"/>
+        <result column="emp_password" property="empPassword"/>
+        <result column="emp_name" property="empName"/>
+        <result column="emp_sex" property="empGender"/>
+        <result column="emp_birthday" property="empBirthday"/>
+        <result column="position_id" property="positionId"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="emp_basicSalary" property="empBasicSalary"/>
+        <result column="emp_insurance" property="empInsurance"/>
+        <result column="emp_creatDate" property="empCreatDate"/>
+        <result column="emp_modifieDate" property="empModifyDate"/>
+        <result column="emp_state" property="empState"/>
+        <result column="emp_modifier" property="empModifier"/>
+        <association property="position" select="com.keji.mapper.PositionMapper.findPositionById"
+         column="position_id"/>
+    </resultMap>
+
+    <sql id="findEmpSql">
+         SElECT * FROM t_emp
+    </sql>
+
+    <!--根据部门id查询员工-->
+    <select id="findEmpsByDeptId" resultMap="empMap">
+        <include refid="findEmpSql"/> WHERE dept_id = #{deptId}
+    </select>
+
+    <!--查询所有员工信息-->
+    <select id="findAllEmps" resultMap="empMap">
+        select * from t_emp
+    </select>
+
+    <!--根据员工编号查询员工-->
+    <select id="findEmpByEmpNumber" resultMap="empMap">
+        <include refid="findEmpSql"/>  WHERE emp_number = #{empNumber}
+    </select>
+
+    <!--获得该员工某年某月的销售业绩-->
+    <select id="getEmpAccount" resultType="java.math.BigDecimal">
+        SELECT account FROM deptSaleStateent WHERE emp_id = #{empId} AND orderYear=#{year} AND orderMonth=#{month}
+    </select>
+
+    <!--添加一条员工信息-->
+    <insert id="addEmp" parameterType="com.keji.pojo.Emp">
+        insert into t_emp values (#{empId},#{empNumber},#{empPassword},#{empName},#{empGender},#{empBirthday},#{positionId},
+        #{deptId},#{empBasicSalary},#{empInsurance},current_timestamp,null,#{empState},#{empModifier})
+    </insert>
+
+    <!--通过员工账号修改一条员工信息-->
+    <update id="updateEmpById" parameterType="com.keji.pojo.Emp">
+        update t_emp set emp_id=#{empId},emp_password = #{empPassword},emp_name = #{empName},
+        emp_sex=#{empGender},emp_birthday=#{empBirthday},position_id = #{positionId},dept_id=#{deptId},
+        emp_basicSalary=#{empBasicSalary},emp_insurance=#{empInsurance},
+        emp_modifieDate=current_timestamp,emp_state=#{empState},emp_modifier=#{empModifier}
+        where emp_number=#{empNumber}
+    </update>
+
+    <!--根据员工编号删除一条员工信息-->
+    <delete id="deleteEmpById">
+        delete from t_emp where emp_id = #{id}
+    </delete>
+</mapper>

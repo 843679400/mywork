@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.UserMapper">
+    <resultMap id="userMap" type="userInfo">
+        <result column="user_id" property="id"></result>
+        <result column="user_loginName" property="userName"></result>
+        <result column="user_loginPwd" property="password"></result>
+        <result column="user_tellnum" property="phoneNumber"></result>
+        <result column="user_describe" property="describe"></result>
+        <result column="user_statu" property="status"></result>
+        <result column="user_isDelete" property="deleteStatus"></result>
+        <result column="user_createDate" property="createDate"></result>
+        <result column="user_updateDate" property="updateDate"></result>
+        <result column="user_modifier" property="modifierId"></result>
+        <collection property="roles" ofType="role">
+            <result column="role_roleId" property="id"/>
+            <result column="role_roleName" property="roleName"/>
+            <result column="role_describe" property="describe"/>
+            <result column="role_status" property="status"/>
+            <result column="role_isDelete" property="deleteStatus"/>
+            <result column="role_createDate" property="createDate"/>
+            <result column="role_updateDate" property="updateDate"/>
+            <result column="role_modifier" property="modifierId"/>
+            <result column="role_num" property="roleNum"/>
+        </collection>
+    </resultMap>
+
+
+    <sql id="findAllUserAndRole">
+             SELECT * FROM t_user
+            LEFT JOIN t_user_role ON t_user.`user_id` = t_user_role.`ur_userId`
+            LEFT JOIN t_role ON t_role.`role_roleId`=t_user_role.`ur_roleId`
+    </sql>
+
+    <!--根据用户名查询用户-->
+    <select id="findUserByUserName" resultMap="userMap">
+        <include refid="findAllUserAndRole"/> WHERE user_loginName = #{userName}
+    </select>
+
+    <!--查询所有的用户-->
+    <select id="findAllUser" resultMap="userMap">
+        <include refid="findAllUserAndRole"/>
+    </select>
+
+    <!--增加用户-->
+    <insert id="addUser">
+        INSERT INTO t_user(user_loginName,user_loginPwd,user_describe,user_tellnum,user_statu)
+        VALUES (#{userName},#{password},#{describe},#{phoneNumber},#{status})
+    </insert>
+
+    <!--根据id删除用户-->
+    <delete id="deleteUser">
+        DELETE FROM t_user WHERE user_id = #{id}
+    </delete>
+
+    <!--修改用户信息-->
+    <update id="updateUser">
+        UPDATE t_user SET user_loginPwd=#{password},user_describe=#{describe},user_updateDate=current_timestamp,
+        user_tellnum=#{phoneNumber},user_modifier=#{modifierId} WHERE user_id = #{id}
+    </update>
+
+    <!--给用户增加角色-->
+    <insert id="addRole">
+        INSERT INTO t_user_role(ur_userId,ur_roleId) VALUES(#{userId},#{roleId})
+    </insert>
+
+
+</mapper>

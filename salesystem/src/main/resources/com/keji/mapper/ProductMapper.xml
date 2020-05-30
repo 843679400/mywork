@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.ProductMapper">
+    <!--property 对应的是实体类的属性列名 column 对应的是数据库的列名这两个名字必须完全一致-->
+    <resultMap id="Product" type="com.keji.pojo.Product">
+        <result property="productId" column="product_id"></result>
+        <result property="productName" column="product_name"></result>
+        <result property="price" column="price"></result>
+        <result property="productBrand" column="product_brand"></result>
+        <result property="productType" column="product_type"></result>
+        <result property="productStandard" column="product_standard"></result>
+        <result property="productAddress" column="product_address"></result>
+        <result property="productWarning" column="product_warning"></result>
+        <result property="productPrice" column="product_price"></result>
+        <result property="modifierId" column="modifier_id"></result>
+        <result property="productState" column="product_state"></result>
+        <result property="productCreatDate" column="product_creatDate"></result>
+        <result property="productModifierDate" column="product_modifierDate"></result>
+        <result property="photopath" column="product_photo"></result>
+        <result property="repository.repQuantity" column="rep_quantity"></result>
+    </resultMap>
+    <!--切换商品状态 上下架商品-->
+    <update id="productState" parameterType="com.keji.pojo.Product">
+        update t_product set price=#{price},product_state=#{productState}
+        where product_id=#{productId}
+    </update>
+
+    <!--根据商品状态获取商品信息-->
+    <select id="stateGetProduct" resultMap="Product">
+        select * from t_product where product_state=#{productState}
+    </select>
+
+    <!--方法名 必须保证一致-->
+    <select id="findAllProducts" resultMap="Product">
+        select * from t_product
+    </select>
+
+
+    <!--查询商品类别-->
+    <select id="fingAllType" resultMap="Product">
+        SELECT distinct product_type FROM t_product
+    </select>
+
+    <!--商品名模糊查询-->
+    <select id="findConditionProduct" resultMap="Product" parameterType="String">
+        SELECT * FROM t_product
+        <where>
+            <if test="name!=''">
+                product_name LIKE concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--分页多条件查询-->
+    <select id="findProduct" resultMap="Product">
+        SELECT * FROM t_product
+        <where>
+            <if test="name!=''">
+                and product_name LIKE concat('%',#{name},'%')
+            </if>
+            <if test="type!=''">
+                and product_type LIKE concat('%',#{type},'%')
+            </if>
+            <if test="state!=''">
+                and product_state LIKE concat('%',#{state},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--根据id 查询每个商品的详细信息 库存 名字-->
+    <select id="findOneProduct" resultMap="Product" parameterType="int">
+        SELECT * FROM t_product where product_id=#{id}
+    </select>
+
+    <!--根据id查询一条商品信息-->
+    <select id="findProductById" resultMap="Product">
+        select * from t_product where product_id = #{id}
+    </select>
+
+    <!--根据id删除一条商品信息-->
+    <delete id="deleteProductById">
+        delete from t_product where product_id = #{id}
+    </delete>
+
+    <!--增加一条商品信息-->
+    <insert id="addProduct" parameterType="com.keji.pojo.Product">
+        insert into t_product values (#{productId},#{productName},#{productBrand},
+        #{productType},#{productStandard},#{productAddress},#{productWarning},#{productPrice},
+        #{modifierId},#{productState},current_timestamp,null,#{photopath},0)
+    </insert>
+
+    <!-- 通过id修改一条商品信息-->
+    <update id="updateProductById" parameterType="com.keji.pojo.Product">
+        update t_product set product_name=#{productName},
+        product_brand=#{productBrand},product_type=#{productType},product_standard=#{productStandard},
+        product_address=#{productAddress},product_warning=#{productWarning},
+        product_price=#{productPrice},modifier_id=#{modifierId},product_state=#{productState},
+        product_modifieDate=current_timestamp
+        where product_id=#{productId}
+    </update>
+
+    <!--商品进货-->
+    <update id="pullProduct" parameterType="com.keji.pojo.Product">
+        update t_product set product_warning=product_warning+#{productWarning}
+        where product_id=#{productId}
+    </update>
+
+    <!--修改商品库存-->
+    <update id="updateProductNum" parameterType="com.keji.pojo.Product">
+        update t_product set product_warning=product_warning-#{productWarning}
+        where product_id=#{productId}
+    </update>
+</mapper>

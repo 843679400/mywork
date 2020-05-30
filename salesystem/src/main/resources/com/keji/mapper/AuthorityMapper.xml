@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.keji.mapper.AuthorityMapper">
+
+    <resultMap id="authorityMap" type="authority">
+        <result property="id" column="auth_id"/>
+        <result property="name" column="auth_name"/>
+        <result property="describe" column="auth_describe"/>
+        <result property="path" column="auth_path"/>
+        <result property="parId" column="auth_parent_id"/>
+    </resultMap>
+
+    <!--查询出所有的权限-->
+    <select id="findAllAuthority" resultMap="authorityMap">
+        SELECT * FROM t_auth
+        WHERE auth_parent_id != 0
+        AND auth_id NOT IN (SELECT ra_authId t_role_auth FROM t_role_auth WHERE ra_roleId=#{id})
+    </select>
+
+    <!--通过id查询权限-->
+    <select id="findAuthorityById" resultMap="authorityMap">
+        SELECT * FROM t_auth WHERE auth_id = #{id}
+    </select>
+
+</mapper>

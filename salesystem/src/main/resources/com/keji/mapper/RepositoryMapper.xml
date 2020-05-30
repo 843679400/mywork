@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.RepositoryMapper">
+
+    <!--映射数据当中的字段-->
+    <resultMap id="RepositoryMap" type="com.keji.pojo.Repository">
+        <result column="rep_id" property="repId"></result>
+        <result column="rep_supId" property="repSupId"></result>
+        <result column="rep_productId" property="repProductId"></result>
+        <result column="rep_purch" property="repPurch"></result>
+        <result column="rep_quantity" property="repQuantity"></result>
+        <result column="rep_purchase_date" property="repPurchDate"></result>
+        <result column="rep_remark" property="repRemark"></result>
+        <result column="rep_createDate" property="repCreate"></result>
+        <result column="rep_updateDate" property="repUpdate"></result>
+        <result column="rep_isDelete" property="repIsDelete"></result>
+        <result column="rep_modifier" property="repModifier"></result>
+        <result column="sup_name" property="supName"></result>
+        <result column="product_name" property="productName"></result>
+        <result column="product_standard" property="productStandard"></result>
+        <result column="product_address" property="productAddress"></result>
+        <result column="product_warning" property="productWarning"></result>
+    </resultMap>
+
+    <!--根据商品名称，库存编号，预警值查询库存-->
+    <select id="findAllRepostitories" resultMap="RepositoryMap" parameterType="com.keji.pojo.Repository">
+        SELECT * from t_repository r INNER JOIN t_supplier s ON r.rep_supId=s.sup_id INNER JOIN t_product p ON r.rep_productId = p.product_id
+        <where>
+            <if test="productName!=null">
+                and product_name like concat('%',#{productName},'%')
+            </if>
+            <if test="repId!=null and repId!=0">
+                and rep_id = #{repId}
+            </if>
+            <if test="productWarning!=null and productWarning!=0">
+                and rep_quantity &lt; #{productWarning}
+            </if>
+        </where>
+    </select>
+
+    <!--查询所有商品库存集合-->
+    <select id="findAllWarnRep" resultMap="RepositoryMap">
+        SELECT * FROM t_product
+    </select>
+
+    <!--根据库存编号查询库存信息-->
+    <select id="findRepositoryById" resultMap="RepositoryMap">
+        select * from t_repository where rep_id = #{repId}
+    </select>
+
+    <!--根据库存编号集合动态查询库存集合-->
+    <select id="findRepListByListId" resultMap="RepositoryMap">
+        select * from t_repository where
+        rep_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!--判断是否存在相同进价商品-->
+    <select id="findPepByProNameAndPur" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM t_repository r INNER JOIN t_product p
+        ON r.rep_productId = p.product_id WHERE rep_purch = #{repPurch} AND product_name = #{productName}
+    </select>
+
+    <!-- 根据库存id修改库存数量，修改日期，修改人id-->
+    <update id="addQuantityByList" parameterType="com.keji.pojo.Repository">
+        UPDATE t_repository
+        SET rep_quantity = rep_quantity + #{repQuantity},rep_updateDate = CURRENT_TIMESTAMP,rep_modifier=#{repModifier}
+        WHERE t_repository.rep_id = #{repId}
+    </update>
+
+    <!--添加库存信息-->
+    <insert id="addRepository" parameterType="com.keji.pojo.Repository">
+        insert into t_repository values (
+        null,#{repSupId},#{repProductId},#{repPurch},#{repQuantity},#{repPurchDate},#{repRemark},CURRENT_TIMESTAMP,null,0,#{repModifier}
+        )
+    </insert>
+
+    <!--根据商品编号减少库存-->
+    <update id="updateQuantity">
+        update t_repository set rep_quantity=rep_quantity-#{quantity} where rep_productId=#{productId}
+    </update>
+
+</mapper>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.OrderMapper">
+    <resultMap id="order" type="com.keji.pojo.Order">
+        <result property="orderId" column="order_id"></result>
+        <result property="orderCusId" column="order_cusId"></result>
+        <result property="orderAggregateAmount" column="order_aggregateAmount"></result>
+        <result property="orderEmpId" column="order_empId"></result>
+        <result property="orderCreateDate" column="order_createDate"></result>
+        <result property="orderUpdateDate" column="order_updateDate"></result>
+        <result property="orderState" column="order_state"></result>
+        <result property="orderDeposit" column="order_deposit"></result>
+        <result property="orderFullPayment" column="order_fullPayment"></result>
+        <result property="orderRemark" column="order_remark"></result>
+        <result property="orderCashPledge" column="order_cashPledge"></result>
+        <!-- 再配置 oderdetail 集合 -->
+        <collection property="orderDetail" ofType="com.keji.pojo.OrderDetail">
+            <result property="id" column="id"></result>
+            <result property="orderId" column="order_id"></result>
+            <result property="orderGooId" column="order_gooId"></result>
+            <result property="orderPrice" column="order_price"></result>
+            <result property="orderPiscounts" column="order_discounts"></result>
+            <result property="orderAmount" column="order_amount"></result>
+            <result property="orderRemark" column="order_remark"></result>
+            <result property="orderCreateDate" column="order_createDate"></result>
+            <result property="orderUpdateDate" column="order_updateDate"></result>
+            <result property="orderModifier" column="order_modifier"></result>
+            <result property="product.productName" column="product_name"></result>
+        </collection>
+        <collection property="consumer" ofType="com.keji.pojo.Consumer">
+            <result property="number" column="con_number"/>
+            <result property="password" column="con_password"/>
+            <result property="phone" column="con_phone"/>
+            <result property="name" column="con_name"/>
+            <result property="address" column="con_address"/>
+        </collection>
+    </resultMap>
+    <!--根据日期查询商品的名称和数量和总金额-->
+    <select id="selectProNameNum" resultMap="order" flushCache="true">
+        SELECT order_discounts,SUM(order_amount) order_amount,SUM(order_aggregateAmount) order_aggregateAmount,sum(order_cashPledge) order_cashPledge
+        FROM (
+SELECT t_orderdetail.`order_discounts`,t_orderdetail.`order_amount`,t_order.`order_aggregateAmount`,t_order.`order_createDate`,t_orderdetail.`order_remark`-t_orderdetail.`order_price` as order_cashPledge
+FROM t_order INNER JOIN t_orderdetail ON t_order.`order_id`=t_orderdetail.`order_id`
+WHERE t_order.`order_createDate` LIKE concat('%',#{orderRemark},'%')) AS t_table
+GROUP BY order_discounts
+    </select>
+    <!--查询订单日期-->
+    <select id="selectMonth" resultMap="order" flushCache="true">
+        SELECT DISTINCT DATE_FORMAT(order_createDate,'%Y-%m') as order_remark FROM t_order
+    </select>
+    <!--根据用户账号查询订单信息-->
+    <select id="getUserOrder" resultMap="order" flushCache="true">
+        select t_order.`order_id`,t_order.`order_cusId`,t_order.`order_aggregateAmount`,t_order.`order_createDate`,t_order.`order_state`,t_orderdetail.`id`,
+t_orderdetail.`order_gooId`,t_orderdetail.`order_price`,t_orderdetail.`order_discounts`,t_orderdetail.`order_amount`,t_orderdetail.`order_remark`,
+t_orderdetail.`order_modifier` from t_order inner join t_orderdetail on t_order.order_id=t_orderdetail.order_id where order_cusId=${orderCusId} and t_orderdetail.order_updateDate=0
+    </select>
+
+    <!--根据订单编号查询信息-->
+    <select id="getOrderDetail" resultMap="order" flushCache="true">
+        SELECT t_order.`order_id`,t_order.`order_cusId`,t_order.`order_aggregateAmount`,t_order.`order_createDate`,t_order.`order_state`,t_orderdetail.`id`,
+t_orderdetail.`order_gooId`,t_orderdetail.`order_price`,t_orderdetail.`order_discounts`,t_orderdetail.`order_amount`,t_orderdetail.`order_remark`,
+t_orderdetail.`order_modifier`,consumer.`con_name` FROM t_order INNER JOIN t_orderdetail ON t_order.order_id=t_orderdetail.order_id INNER JOIN consumer ON t_order.`order_cusId`=consumer.`con_number` WHERE t_order.order_id=#{orderId}
+    </select>
+    <!--查询所有订单-->
+    <select id="getAllOrder" resultMap="order" flushCache="true">
+        SELECT t_order.`order_id`,t_order.`order_cusId`,t_order.`order_aggregateAmount`,t_order.`order_createDate`,t_order.`order_state`,consumer.`con_name`,consumer.`con_address`,consumer.`con_phone`FROM t_order INNER JOIN consumer ON t_order.`order_cusId`=consumer.`con_number`
+        <where>
+            <if test="orderId!=''">
+                and order_id = #{orderId}
+            </if>
+            <if test="orderState!=''">
+                and order_state = #{orderState}
+            </if>
+        </where>
+    </select>
+
+    <!--添加订单-->
+    <insert id="addOrder" parameterType="com.keji.pojo.Order">
+        insert into t_order values(null,#{orderId},#{orderCusId},#{orderAggregateAmount},#{orderEmpId},#{orderCreateDate},#{orderUpdateDate},
+        #{orderState},#{orderDeposit},#{orderFullPayment},#{orderRemark},#{orderCashPledge})
+    </insert>
+
+    <!--修改订单状态-->
+    <update id="updateOrder">
+        update t_order set order_state=#{orderState},order_fullPayment='1' where order_id=#{orderId}
+    </update>
+
+    <!--根据订单编号查询订单-->
+    <select id="findOrder" resultMap="order">
+        SELECT order_id,customer_name,order_aggregateAmount,t_order.order_createDate,order_cashPledge
+        FROM t_order
+        INNER JOIN t_customer ON t_order.`order_cusId`=t_customer.`customer_id`
+        WHERE order_id=#{orderId} and order_fullPayment=1
+    </select>
+
+    <!--修改订单全款状态-->
+    <update id="updateFullPayment">
+        update t_order set order_fullPayment=0 where order_id=#{orderId}
+    </update>
+
+    <!--查询售后订单-->
+    <select id="findRefundOrder" resultMap="order">
+        SELECT order_id,customer_name,order_aggregateAmount,order_createDate,user_describe
+        FROM t_order
+        INNER JOIN t_customer ON t_order.`order_cusId`=t_customer.`customer_id`
+        INNER JOIN t_user ON t_user.`user_id`=t_order.`order_empId`
+        WHERE order_fullPayment=0 and order_id=#{orderId}
+    </select>
+
+
+    <!--根据订单编号删除订单-->
+    <delete id="delOrder">
+        delete from t_order where order_id=#{orderId}
+    </delete>
+
+
+</mapper>

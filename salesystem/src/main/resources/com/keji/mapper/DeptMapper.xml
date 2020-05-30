@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.DeptMapper">
+
+    <resultMap id="deptMap" type="com.keji.pojo.Dept">
+        <result property="deptId" column="dept_id"></result>
+        <result property="deptName" column="dept_name"></result>
+        <result property="deptPrincipal" column="dept_principal"></result>
+        <result property="deptCreatDate" column="dept_creatDate"></result>
+        <result property="deptModifieDate" column="dept_modifieDate"></result>
+        <result property="deptModifier" column="dept_modifier"></result>
+        <result property="deptState" column="dept_state"></result>
+        <collection property="empList" ofType="emp" select="com.keji.mapper.EmpMapper.findEmpsByDeptId"
+                    column="dept_id">
+        </collection>
+    </resultMap>
+
+    <sql id="findDeptSql">
+        select * from t_dept
+    </sql>
+
+    <!--查询所有部门信息-->
+    <select id="findAllDepts" resultMap="deptMap">
+        <include refid="findDeptSql"/>
+    </select>
+
+    <!--根据部门名称查询部门-->
+    <select id="findDeptByDeptName" resultMap="deptMap">
+        <include refid="findDeptSql"/>
+        WHERE dept_name = #{deptName}
+    </select>
+
+    <!--通过部门编号查询一条部门信息-->
+    <select id="findDeptById" resultMap="deptMap">
+        select * from t_dept where dept_id = #{id}
+    </select>
+
+    <!--添加一条部门信息-->
+    <insert id="addDept" parameterType="com.keji.pojo.Dept">
+        insert into t_dept values ( #{deptId} ,#{deptName}, #{deptPrincipal},
+        current_timestamp,null,  #{deptModifier}, #{deptState})
+    </insert>
+
+    <!--删除一条部门信息-->
+    <delete id="deleteDeptById">
+        delete from t_dept where dept_id = #{id}
+    </delete>
+
+    <!--修改一条部门信息-->
+    <update id="updateDeptById" parameterType="com.keji.pojo.Dept">
+    update t_dept set dept_name = #{deptName},dept_principal = #{deptPrincipal},
+    dept_modifieDate =current_timestamp, dept_modifier = #{deptModifier},
+        dept_state = #{deptState}  where dept_id = #{deptId}
+</update>
+
+
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.ProductStatisticsMapper">
+    <resultMap id="productStatistics" type="com.keji.pojo.ProductStatistics">
+        <result property="productid" column="productid"></result>
+        <result property="productName" column="productName"></result>
+        <result property="orderamount" column="orderamount"></result>
+        <result property="year" column="orderYear"></result>
+        <result property="month" column="orderMonth"></result>
+    </resultMap>
+
+    <!--查询所有的商品-->
+    <select id="findByProduct" resultMap="productStatistics">
+      SELECT * FROM productAmountStateent
+    </select>
+
+    <!--查询商品名称-->
+    <select id="findAmountByIDName" resultMap="productStatistics">
+        SELECT * FROM productAmountStateent productName=#{productName}
+    </select>
+
+    <!--查询输入年份月份的销售额-->
+    <select id="findAmountByYearMonth" resultMap="productStatistics">
+        SELECT * FROM productAmountStateent WHERE productid = #{productid}
+        AND orderYear = #{year} AND orderMonth = #{month}
+    </select>
+
+</mapper>

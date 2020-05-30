@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.GatheringMapper">
+    <resultMap type="com.keji.pojo.Gathering" id="gathering">
+        <result property="gathId" column="gath_id"></result>
+        <result property="gathDate" column="gath_date"></result>
+        <result property="gathMoney" column="gath_money"></result>
+        <result property="gathOrderId" column="gath_orderId"></result>
+        <result property="gathRemark" column="gath_remark"></result>
+        <result property="gathCreateDate" column="gath_createDate"></result>
+        <result property="gathUpdateDate" column="gath_updateDate"></result>
+        <result property="gathState" column="gath_state"></result>
+        <result property="gathModifier" column="gath_modifier"></result>
+    </resultMap>
+
+    <select id="findGathering" resultMap="gathering">
+        select * from t_gathering
+    </select>
+
+    <!--添加还款信息-->
+    <insert id="addGathering" parameterType="com.keji.pojo.Gathering">
+        insert into t_gathering values(null,#{gathDate},#{gathMoney},#{gathOrderId},#{gathRemark},#{gathCreateDate},#{gathUpdateDate},#{gathState},#{gathModifier})
+    </insert>
+</mapper>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="/js/jquery/jquery-1.12.4.min.js"></script>
+<script src="/js/moment/moment.min.js"></script>
+<script src="/js/numeral/numeral.min.js"></script>
+<script src="/js/numeral/chs.min.js"></script>
+<script src="/js/common/base.js"></script>
+<script src="/js/common/normal.js"></script>
+<body>
+<a href="http://localhost:8080/">返回首页</a>
+</body>
+<script>
+    //获取登陆账户信息
+    $.post("/consumer/getNumber",function (result) {
+        var obj=$.dealJSONObj(result);
+        if(!obj.code){
+            if(obj.data.online){
+                //支付成功清空清空购物车
+                $.post("/payment/success",{number:obj.data.number},function (result) {
+                    if(result=='ok'){
+                        alert('完毕')
+                    }
+                })
+            }
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+        <meta name="author" content="order by dede58.com"/>
+		<title>小米6立即购买-小米商城</title>
+		<link rel="stylesheet" type="text/css" href="./css/style.css">
+	</head>
+	<script src="/js/jquery/jquery-1.12.4.min.js"></script>
+	<script src="/js/moment/moment.min.js"></script>
+	<script src="/js/numeral/numeral.min.js"></script>
+	<script src="/js/numeral/chs.min.js"></script>
+	<script src="/js/common/base.js"></script>
+	<script src="/js/common/normal.js"></script>
+	<body>
+	<!-- start header -->
+		<header>
+			<div class="top center">
+				<div class="left fl">
+					<ul>
+						<div class="clear"></div>
+					</ul>
+				</div>
+				<div class="right fr">
+					<div class="gouwuche fr"><a href="index.html">返回首页</a></div>
+					<div class="clear"></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</header>
+	<!-- xiangqing -->
+	<form action="post" method="">
+	<div class="jieshao mt20 w" id="tbody">
+		<!--<div class="left fl"><img src="./image/liebiao_xiaomi6.jpg"></div>
+		<div class="right fr" >
+			<div class="h3 ml20 mt20">小米6</div>
+			<div class="jianjie mr40 ml20 mt10">变焦双摄，4 轴防抖 / 骁龙835 旗舰处理器，6GB 大内存，最大可选128GB 闪存 / 5.15" 护眼屏 / 四曲面玻璃/陶瓷机身</div>
+			<div class="jiage ml20 mt10">2499.00元</div>
+			<div class="xqxq mt20 ml20">
+				<div class="top1 mt10">
+					<div class="left1 fl">小米6 全网通版 6GB内存 64GB 亮黑色</div>
+					<div class="right1 fr">2499.00元</div>
+					<div class="clear"></div>
+				</div>
+				<div class="bot mt20 ft20 ftbc">总计：2499元</div>
+			</div>
+			<div class="xiadan ml20 mt20">
+					<input class="jrgwc"  type="button" name="jrgwc" value="立即选购" />
+					<input class="jrgwc" type="button" name="jrgwc" value="加入购物车" />
+				
+			</div>
+		</div>-->
+		<div class="clear"></div>
+	</div>
+	</form>
+	<!-- footer -->
+	<footer class="mt20 center">
+			
+			<div class="mt20">小米商城|MIUI|米聊|多看书城|小米路由器|视频电话|小米天猫店|小米淘宝直营店|小米网盟|小米移动|隐私政策|Select Region</div>
+			<div>©mi.com 京ICP证110507号 京ICP备10046444号 京公网安备11010802020134号 京网文[2014]0059-0009号</div> 
+			<div>违法和不良信息举报电话：185-0130-1238，本网站所列数据，除特殊说明，所有数据均出自我司实验室测试</div>
+
+		</footer>
+
+	</body>
+<script>
+	var id
+	$(function () {
+		//获取商品编号
+		id=decodeURI(window.location.href.split("?")[1])
+		init()
+	})
+
+	//初始化商品信息
+	function init() {
+		$.post("/productController/getOneProduct",{productId:id},function (result) {
+			var str="<div class='left fl'><a><img src={2} width='560' height='560'></a></div>" +
+					"<div class='right fr'>" +
+					"<div class='h3 ml20 mt20'>{1}</div>" +
+					"<div class='jianjie mr40 ml20 mt10'>{4}</div>" +
+					"<div class='jiage ml20 mt10'>{5}元</div>" +
+					"<div class='xqxq mt20 ml20'>" +
+					"<div class='top1 mt10'>" +
+					"<div class='left1 fl'>{1}</div>" +
+					"<div class='right1 fr'>{5}元</div>" +
+					"<div class='clear'></div>" +
+					"</div>" +
+					"<div class='bot mt20 ft20 ftbc'>总计:{5}元</div>" +
+					"</div>" +
+					"<div class='xiadan ml20 mt20'>" +
+					"<input class='jrgwc'  type='button' name='jrgwc' onclick='buy()' value='立即选购' />" +
+					"<input class='jrgwc' type='button' name='jrgwc' onclick='addShopCart()' value='加入购物车' />" +
+					"</div>" +
+					"</div>"
+			var s=""
+			var obj=$.dealJSONObj(result)
+			if(!obj.code){
+				$(obj.data).each(function (i, n) {
+					s += str.formatStr(
+							n.productId,
+							n.productName,
+							n.photopath,
+							n.productBrand,
+							n.productStandard,
+							n.price
+					)
+				})
+				$("#tbody").html(s)
+			}
+		})
+	}
+
+	var number
+
+	//直接购买
+	function buy() {
+		$.post("/consumer/getNumber",function (result) {
+				var obj=$.dealJSONObj(result);
+				if(obj.data.online){
+					//location.href="gouwuche.html"
+					number = obj.data.number
+					shopCart();
+				}else{
+					alert("你还未登陆请登录");
+					location.href="login.html"
+				}
+		})
+	}
+	
+	//加入购物车跳转购物车页面
+	function shopCart() {
+        $.post("/shopCart/addShopCart",{number:number,id:id,num:"1"},function (result) {
+            var obj=$.dealJSONObj(result);
+            if(!obj.code){
+                location.href="gouwuche.html"
+            }
+        })
+	}
+
+	//加入购物车提示加入成功继续购物
+	function addShopCart() {
+		$.post("/consumer/getNumber",function (result) {
+			var obj=$.dealJSONObj(result);
+			if(obj.data.online){
+				number = obj.data.number
+				$.post("/shopCart/addShopCart",{number:number,id:id,num:"1"},function (result) {
+					var obj=$.dealJSONObj(result);
+					if(!obj.code){
+						alert(obj.msg);
+					}
+				})
+			}else{
+				alert("你还未登陆请登录");
+				location.href="login.html"
+			}
+		})
+
+	}
+
+
+</script>
+</html>

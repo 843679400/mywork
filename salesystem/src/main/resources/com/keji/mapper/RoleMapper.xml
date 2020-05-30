@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.RoleMapper">
+    <resultMap id="roleMap" type="Role">
+        <result column="role_roleId" property="id"/>
+        <result column="role_roleName" property="roleName"/>
+        <result column="role_describe" property="describe"/>
+        <result column="role_status" property="status"/>
+        <result column="role_isDelete" property="deleteStatus"/>
+        <result column="role_createDate" property="createDate"/>
+        <result column="role_updateDate" property="updateDate"/>
+        <result column="role_modifier" property="modifierId"/>
+        <result column="role_num" property="roleNum"/>
+        <collection property="authorities" ofType="authority">
+            <result property="id" column="auth_id"/>
+            <result property="name" column="auth_name"/>
+            <result property="describe" column="auth_describe"/>
+            <result property="path" column="auth_path"/>
+            <result property="parId" column="auth_parent_id"/>
+        </collection>
+    </resultMap>
+
+    <sql id="findRole">
+        SELECT * FROM t_role
+        LEFT JOIN `t_role_auth` ON t_role.`role_roleId` = t_role_auth.`ra_roleId`
+        LEFT JOIN t_auth ON t_role_auth.`ra_authId` = t_auth.`auth_id`
+    </sql>
+    
+    <!--根据id查询role-->
+    <select id="findRoleById" resultMap="roleMap">
+        <include refid="findRole"/> WHERE role_roleId = #{roleId}
+    </select>
+
+    <!--查询所有的角色-->
+    <select id="findAllRole" resultMap="roleMap">
+        <include refid="findRole"/>
+    </select>
+
+    <select id="findAllRoleNotAuth" resultMap="roleMap">
+        SELECT * FROM t_role
+    </select>
+    <!--增加角色-->
+    <insert id="addRole">
+        INSERT INTO `t_role`(role_roleName,role_describe) VALUES(#{roleName},#{describe})
+    </insert>
+
+    <!--根据角色名称查找角色-->
+    <select id="findRoleByRoleName" resultMap="roleMap">
+        <include refid="findRole"/> WHERE role_roleName = #{roleName}
+    </select>
+
+    <!--给角色添加权限-->
+    <insert id="addAuth">
+        INSERT INTO `t_role_auth`(ra_roleId,ra_authId) VALUES(#{roleId},#{authId})
+    </insert>
+
+    <!--删除角色-->
+    <delete id="deleteRole">
+        DELETE FROM t_role WHERE role_roleId = #{roleId}
+    </delete>
+
+    <select id="findUserDontHaveRoles" resultMap="roleMap">
+        SELECT * FROM t_role
+        WHERE role_roleId NOT IN (SELECT  ur_roleId FROM `t_user_role` WHERE ur_userId=#{userId})
+    </select>
+</mapper>

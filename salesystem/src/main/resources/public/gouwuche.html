@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+        <meta name="author" content="order by dede58.com"/>
+		<title>我的购物车-小米商城</title>
+		<link rel="stylesheet" type="text/css" href="./css/style.css">
+	</head>
+	<script src="/js/jquery/jquery-1.12.4.min.js"></script>
+	<script src="/js/moment/moment.min.js"></script>
+	<script src="/js/numeral/numeral.min.js"></script>
+	<script src="/js/numeral/chs.min.js"></script>
+	<script src="/js/common/base.js"></script>
+	<script src="/js/common/normal.js"></script>
+	<body>
+	<!-- start header -->
+	<!--end header -->
+
+<!-- start banner_x -->
+		<div class="banner_x center">
+			<a href="./index.html" target="_blank"><div class="logo fl"></div></a>
+			
+			<div class="wdgwc fl ml40">我的购物车</div>
+			<div class="wxts fl ml20">温馨提示：产品是否购买成功，以最终下单为准哦，请尽快结算</div>
+			<div class="wxts fl ml20"><span id="number"></span></div>
+			<div class="clear"></div>
+		</div>
+		<div class="xiantiao"></div>
+		<div class="gwcxqbj">
+			<div class="gwcxd center">
+				<div class="top2 center">
+					<div class="sub_top fl">
+						<input type="checkbox" value="quanxuan" class="quanxuan" hidden="hidden"/>
+					</div>
+					<div class="sub_top fl">商品名称</div>
+					<div class="sub_top fl">单价</div>
+					<div class="sub_top fl">数量</div>
+					<div class="sub_top fl">小计</div>
+					<div class="sub_top fr">操作</div>
+					<div class="clear"></div>
+				</div>
+				<div id="tbody">
+				<!--<div class="content2 center">
+					<div class="sub_content fl ">
+						<input type="checkbox" value="quanxuan" class="quanxuan" hidden="hidden"/>
+					</div>
+					<div class="sub_content fl"><img src="./image/gwc_xiaomi6.jpg"></div>
+					<div class="sub_content fl ft20">小米6全网通6GB内存+64GB 亮黑色</div>
+					<div class="sub_content fl ">2499元</div>
+					<div class="sub_content fl">
+						<input class="shuliang" type="number" value="1" step="1" min="1" >
+					</div>
+					<div class="sub_content fl">2499元</div>
+					<div class="sub_content fl"><a href="">×</a></div>
+					<div class="clear"></div>
+				</div>-->
+				</div>
+			</div>
+			<div class="jiesuandan mt20 center">
+				<div class="tishi fl ml20">
+					<ul>
+						<li><a href="./index.html">继续购物</a></li>
+						<li>|</li>
+						<div class="clear"></div>
+					</ul>
+				</div>
+				<div class="jiesuan fr">
+					<form action="/payment/pay" method="post">
+						<input type="number" name="usernumber" hidden="hidden" value="x">
+						<input type="text" name="pricesum1" hidden="hidden">
+					<div class="jiesuanjiage fl">合计（不含运费）：<span id="pricesum"></span></div>
+						<div class="jsanniu fr"><input class="jsan" type="button" id="jiesuan1"  onclick="yanzheng()" value="去结算"/></div>
+					<div class="jsanniu fr"><input class="jsan" type="submit" id="jiesuan"  value="去结算" hidden="hidden"/></div>
+					</form>
+					<div class="clear"></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+			
+		</div>
+
+  
+
+
+
+	</body>
+<script>
+	//验证购物车是否为空
+	function yanzheng() {
+		alert("购物车为空，买点东西再来结算吧！")
+	}
+
+	//用户账号
+	var usernumber
+    $(function () {
+		$.post("/consumer/getNumber",function (result) {
+			var obj=$.dealJSONObj(result);
+			if(!obj.code){
+				if(obj.data.online){
+
+				}else{
+					alert("请登录");
+					location.href="login.html"
+				}
+			}
+		})
+
+
+    	//总金额
+    	var pricesum=0
+
+        //获取登陆账户信息
+        $.post("/consumer/getNumber",function (result) {
+            var obj=$.dealJSONObj(result);
+            if(!obj.code){
+                if(obj.data.online){
+                    $("#number").html('欢迎客户:'+obj.data.number);
+
+                    usernumber=obj.data.number
+					$("[name='usernumber']").val(usernumber)
+                    $.post("/shopCart/findShopCart",{number:obj.data.number},function (result) {
+						var size=0
+                        var str="<div class=\"content2 center\">" +
+                            "<div class=\"sub_content fl \">" +
+                            "<input type=\"checkbox\" value=\"quanxuan\" class=\"quanxuan\" hidden=\"hidden\"/>" +
+                            "</div>" +
+                            "<div class=\"sub_content fl\"><img src={1} width='100' height='100'></div>" +
+                            "<div class=\"sub_content fl ft20\">{3}</div>" +
+                            "<div class=\"sub_content fl \">{4}</div>" +
+                            "<div class=\"sub_content fl\">" +
+                            "<input class=\"shuliang\" onblur='setting(this)' type=\"number\" value={5} step=\"1\" min=\"1\" >" +
+                            "</div>" +
+                            "<div class=\"sub_content fl\">{6}</div>" +
+                            "<div class=\"sub_content fl\"><a href='javascript:del({7})'>×</a></div>" +
+								"<div class=\"sub_content fl\" hidden='hidden'>{7}</div>" +
+                            "<div class=\"clear\"></div>" +
+                            "</div>"
+                        var s=""
+                        var obj=$.dealJSONObj(result)
+                        if(!obj.code) {
+                            $(obj.data).each(function (i, n) {
+                            	pricesum=n.productSum*n.product.price+pricesum
+                                s += str.formatStr(
+                                    n.product.productId,
+                                    n.product.photopath,
+                                    n.product.productBrand,
+                                    n.product.productName,
+                                    n.product.price,
+                                    n.productSum,
+                                    n.productSum*n.product.price,
+                                    n.id
+                                )
+                            })
+                            $("#tbody").html(s)
+							$("#pricesum").html(pricesum+"元")
+							$("[name='pricesum1']").val(pricesum)
+							//pricesum=0
+
+							//设置结算按钮
+							if(pricesum==0){
+								$("#jiesuan").hide()
+							}else{
+								$("#jiesuan1").hide()
+								$("#jiesuan").show()
+							}
+                        }
+                    })
+                }
+            }
+        })
+
+
+    })
+
+	//删除购物车
+    function del(id){
+        $.post("/shopCart/delshopCart",{id:id},function (result) {
+			var obj=$.dealJSONObj(result)
+			if(!obj.code){
+				location.href="gouwuche.html"
+			}
+		})
+    }
+
+    //设置数量
+	function setting(the) {
+    	sum = $(the).val()
+		price = $(the).parent().parent().find("div").eq(3).html()
+		//根据数量变化实时改变小计
+		$(the).parent().parent().find("div").eq(5).html(sum*price)
+		//去后台修改购物车
+		var id = $(the).parent().parent().find("div").eq(7).html()
+		$.post("/shopCart/updateShopCart",{num:sum,id:id},function (result) {
+			var obj=$.dealJSONObj(result)
+			if(!obj.code){
+				location.href="gouwuche.html"
+			}
+		})
+	}
+</script>
+</html>

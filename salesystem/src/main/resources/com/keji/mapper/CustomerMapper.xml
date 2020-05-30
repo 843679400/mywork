@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.CustomerMapper">
+    <!--property 对应的是实体类的属性列名 column 对应的是数据库的列名这两个名字必须完全一致-->
+    <resultMap id="Customer" type="com.keji.pojo.Customer">
+        <result property="customerId" column="customer_id"></result>
+        <result property="customerName" column="customer_name"></result>
+        <result property="customerSex" column="customer_sex"></result>
+        <result property="customerTelephone" column="customer_telephone"></result>
+        <result property="customerDate" column="customer_date"></result>
+        <result property="customerCreatDate" column="customer_creatDate"></result>
+        <result property="customerModifieDate" column="customer_modifieDate"></result>
+        <result property="customerModifier" column="customer_modifier"></result>
+        <result property="customerState" column="customer_state"></result>
+    </resultMap>
+    <!--查询所有客户信息-->
+    <select id="findAllCustomer" resultMap="Customer">
+      select * from t_Customer
+    </select>
+
+    <!--通过客户编号查询一条客户信息-->
+    <select id="findCustomerById" resultMap="Customer">
+        select * from t_customer where customer_id = #{id}
+    </select>
+
+    <!--根据手机号查询客户-->
+    <select id="findCustPhone" resultMap="Customer">
+        select * from t_Customer where customer_telephone=#{phone}
+    </select>
+
+    <!--添加一条客户信息-->
+    <insert id="addCustomer" parameterType="com.keji.pojo.Customer">
+        insert into t_Customer values(#{customerId},#{customerName},#{customerSex},
+        #{customerTelephone},#{customerDate},current_timestamp,null,#{customerModifier},#{customerState})
+    </insert>
+
+    <!--通过客户编号修改一条客户信息-->
+    <update id="updateCustomerById" parameterType="com.keji.pojo.Customer">
+        update t_customer set customer_name=#{customerName} ,customer_sex = #{customerSex},
+        customer_telephone=#{customerTelephone},customer_date=#{customerDate},
+        customer_modifieDate=current_timestamp,customer_modifier=#{customerModifier},customer_state = #{customerState}
+        where customer_id = #{customerId}
+    </update>
+
+    <!--删除一条客户信息-->
+    <delete id="delCustomerById">
+        delete from t_Customer where customer_id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.OrderDetailMapper">
+    <resultMap id="orderDetail" type="com.keji.pojo.OrderDetail">
+        <result property="orderId" column="order_id"></result>
+        <result property="orderGooId" column="order_gooId"></result>
+        <result property="orderPrice" column="order_price"></result>
+        <result property="orderPiscounts" column="order_discounts"></result>
+        <result property="orderAmount" column="order_amount"></result>
+        <result property="orderRemark" column="order_remark"></result>
+        <result property="orderCreateDate" column="order_createDate"></result>
+        <result property="orderUpdateDate" column="order_updateDate"></result>
+        <result property="orderModifier" column="order_modifier"></result>
+        <result property="product.productName" column="product_name"></result>
+        <result property="order.orderCashPledge" column="order_cashPledge"></result>
+        <result property="order.customer.customerName" column="customer_name"></result>
+        <result property="order.orderAggregateAmount" column="order_aggregateAmount"></result>
+    </resultMap>
+    <!--修改订单详情-->
+    <update id="updateOrderDetail" parameterType="com.keji.pojo.OrderDetail">
+        update t_orderdetail set t_orderdetail.order_updateDate=#{orderUpdateDate} where t_orderdetail.id=#{id}
+    </update>
+
+    <!--查询所有订单详情-->
+    <select id="findOrderDetail" resultMap="orderDetail">
+        select * from t_orderdetail
+    </select>
+
+
+    <!--添加订单详情-->
+    <insert id="addOrderDetail" parameterType="com.keji.pojo.OrderDetail">
+        insert into t_orderdetail values(null,#{orderId},#{orderGooId},#{orderPrice},#{orderPiscounts},#{orderAmount},
+        #{orderRemark},#{orderCreateDate},#{orderUpdateDate},#{orderModifier})
+    </insert>
+
+    <!--根据客户订单编号查询订单详情-->
+    <select id="findCustOrderDetail" resultMap="orderDetail" parameterType="String">
+        SELECT t_order.order_id,product_name,order_price,order_amount,customer_name,order_cashPledge,order_aggregateAmount  FROM t_order
+        INNER JOIN t_customer ON t_order.`order_cusId`=t_customer.`customer_id`
+        INNER JOIN t_orderdetail ON t_orderdetail.`order_id`=t_order.`order_id`
+        INNER JOIN t_product ON t_product.`product_id`=t_orderdetail.`order_gooId`
+        WHERE t_order.`order_id`= #{orderId}
+    </select>
+
+    <!--删除订单详情-->
+    <delete id="delOrderDetail">
+        delete from t_orderdetail where order_id=#{orderId}
+    </delete>
+
+
+    <!--查询订单详情的 年-->
+    <select id="findYear" resultType="Integer">
+        SELECT DISTINCT year FROM orderDetailView
+    </select>
+
+    <!--查询订单详情的 月-->
+    <select id="findMonth" resultType="Integer">
+        SELECT DISTINCT month FROM orderDetailView
+    </select>
+
+    <!--查询订单详情的 日-->
+    <select id="findDay" resultType="Integer">
+        SELECT DISTINCT day FROM orderDetailView
+    </select>
+
+    <!--查询每种商品的销量-->
+    <select id="selectProductNum" resultMap="orderDetail">
+        SELECT order_gooId,order_discounts,SUM(order_amount) FROM t_orderDetail GROUP BY order_gooId
+    </select>
+</mapper>

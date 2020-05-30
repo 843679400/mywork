@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.keji.mapper.PositionMapper">
+    <!--property 对应的是实体类的属性列名 column 对应的是数据库的列名这两个名字必须完全一致-->
+    <resultMap id="Position" type="com.keji.pojo.Position">
+        <result property="posId" column="pos_id"></result>
+        <result property="posName" column="pos_name"></result>
+        <result property="posCreatDate" column="pos_creatDate"></result>
+        <result property="posModifierDate" column="pos_modifierDate"></result>
+        <result property="posModifier" column="pos_modifier"></result>
+        <result property="posState" column="pos_state"></result>
+    </resultMap>
+    <!--查询所有职务信息-->
+    <select id="findAllPosition" resultMap="Position">
+      select * from t_position
+    </select>
+    <!--根据id查询一条职务信息-->
+    <select id="findPositionById" resultMap="Position">
+        select * from t_position where pos_id = #{id}
+    </select>
+    <!--根据id删除一条职务信息-->
+    <delete id="delPositionById">
+        delete from t_position where pos_id = #{id}
+    </delete>
+    <!--增加一条职务信息-->
+    <insert id="addPosition" parameterType="com.keji.pojo.Position">
+        insert into t_position values (#{posId},#{posName},current_timestamp,null,
+        #{posModifier},#{posState})
+    </insert>
+   <!-- 通过id修改一条职务信息-->
+    <update id="updatePositionById" parameterType="com.keji.pojo.Position">
+        update t_position set pos_name=#{posName},
+        pos_modifieDate=current_timestamp,pos_modifier=#{posModifier},pos_state=#{posState} where
+        pos_id=#{posId}
+    </update>
+
+</mapper>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+        <meta name="author" content="order by dede58.com"/>
+		<title>小米手机列表</title>
+		<link rel="stylesheet" type="text/css" href="./css/style.css">
+	</head>
+	<script src="/js/jquery/jquery-1.12.4.min.js"></script>
+	<script src="/js/moment/moment.min.js"></script>
+	<script src="/js/numeral/numeral.min.js"></script>
+	<script src="/js/numeral/chs.min.js"></script>
+	<script src="/js/common/base.js"></script>
+	<script src="/js/common/normal.js"></script>
+	<body>
+	<!-- start header -->
+		<header>
+			<div class="top center">
+				<div class="left fl">
+					<ul>
+						<li>|</li>
+						<li><a href="syslogin.html">后台管理</a></li>
+						<li>|</li>
+						<div class="clear"></div>
+					</ul>
+				</div>
+				<div class="right fr">
+					<div class="gouwuche fr"><a href="javascript:shopCart()">购物车</a></div>
+					<div class="fr">
+						<ul>
+							<li><a href="./login.html" target="_blank">登录</a></li>
+							<li>|</li>
+							<li><a href="./register.html" target="_blank" >注册</a></li>
+							<li>|</li>
+							<li><a id="gerenzhongxin" href="javascript:void(0);" target="_blank">个人中心</a></li>
+							<li>|</li>
+							<li id="number"></li>
+						</ul>
+					</div>
+					<div class="clear"></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</header>
+	<!--end header -->
+
+<!-- start banner_x -->
+		<div class="banner_x center">
+			<a href="./index.html" target="_blank"><div class="logo fl"></div></a>
+			<a href=""><div class="ad_top fl"></div></a>
+			<div class="nav fl">
+				<ul>
+					<li><a href="">小米手机</a></li>
+				</ul>
+			</div>
+			<div class="search fr">
+				<div class="clear"></div>
+			</div>
+		</div>
+		<div class="danpin center" >
+			
+			<div class="biaoti center">小米手机</div>
+			<div class="main center" id="tbody">
+				<div class="clear"></div>
+			</div>
+		</div>
+	</body>
+<script>
+	$(function () {
+		//初始化商品
+		init()
+		//获取登陆账户信息
+		$.post("/consumer/getNumber",function (result) {
+			var obj=$.dealJSONObj(result);
+			if(!obj.code){
+				if(obj.data.online){
+					$("#number").html('欢迎客户:'+obj.data.number);
+				}
+			}
+		})
+		//点击个人中心，判断用户是否登陆
+		$("#gerenzhongxin").click(function () {
+			$.post("/consumer/getNumber",function (result) {
+				var obj=$.dealJSONObj(result);
+				if(obj.data.online){
+					location.href="self_info.html"
+				}else{
+					alert("你还未登陆请登录");
+				}
+			})
+		})
+	})
+
+	//获取商品列表
+	function init() {
+		$.post("/productController/getIndexProduct",function (result) {
+			var str="<div class='mingxing fl mb20' style='border:2px solid #fff;width:230px;cursor:pointer;' " +
+					"onmouseout=\"this.style.border='2px solid #fff'\" onmousemove=\"this.style.border='2px solid red'\">" +
+					"<div class='sub_mingxing'><a href='xiangqing.html?{0}'><img src={1} alt=''></a></div>" +
+					"<div class='pinpai'><a href='xiangqing.html?{0}'>{2}</a></div>" +
+					"<div class='jiage'>{4}元</div>" +
+					"</div>"
+			var s=""
+			var obj=$.dealJSONObj(result)
+			if(!obj.code) {
+				$(obj.data).each(function (i, n) {
+					s += str.formatStr(
+							n.productId,
+							n.photopath,
+							n.productName,
+							n.productStandard,
+							n.price
+					)
+				})
+				$("#tbody").html(s)
+			}
+		})
+	}
+
+	//购物车
+	function shopCart() {
+		$.post("/consumer/getNumber",function (result) {
+			var obj=$.dealJSONObj(result);
+			if(obj.data.online){
+				location.href="gouwuche.html"
+			}else{
+				alert("你还未登陆请登录");
+				location.href="login.html"
+			}
+		})
+	}
+</script>
+</html>

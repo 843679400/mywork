@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.keji.mapper.SalaryBillsMapper">
+    <resultMap id="salaryBills" type="SalaryBills">
+            <result column="salary_emp_number" property="empNumber"/>
+            <result column="salary_date" property="data"/>
+            <result column="salary_bonus" property="bonus"/>
+            <result column="salary_late" property="late"/>
+            <result column="salary_overtime" property="overTime"/>
+            <result column="salary_salary" property="salary"/>
+            <result column="salary_emp_position" property="positionName"/>
+            <result column="salary_emp_base" property="basicSalary"/>
+            <result column="salary_empinsurance" property="insurance"/>
+            <result column="salary_jixiao" property="performance"/>
+        </resultMap>
+    <!--添加一条工资单信息-->
+    <insert id="addSalary" parameterType="com.keji.pojo.SalaryBills">
+        INSERT  INTO `t_salary`(`salary_emp_number`,`salary_date`,`salary_bonus`,`salary_late`,`salary_overtime`,`salary_salary`,`salary_emp_position`,`salary_emp_base`,`salary_empinsurance`,`salary_jixiao`)
+         VALUES (#{empNumber},#{data},#{bonus},#{late},#{overTime},#{salary},#{positionName},
+        #{basicSalary},#{insurance},#{performance});
+    </insert>
+        <!--    查询员工绩效-->
+    <select id="getTheEmpPerformance" resultType="java.math.BigDecimal">
+        SELECT SUM(order_aggregateAmount) FROM `t_order`
+        WHERE t_order.`order_empId`=#{empNumber} AND order_createDate BETWEEN #{beginDate} AND #{endDate}
+    </select>
+
+        <!--    每个员工根据编号 和 日期查询自己的工资-->
+    <select id="findSalaryByEmpNumberData" resultMap="salaryBills">
+        SELECT * FROM t_salary WHERE salary_emp_number = #{empNumber} AND  salary_date =#{date}
+    </select>
+
+</mapper>

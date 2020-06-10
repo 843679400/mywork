@@ -1,0 +1,39 @@
+hadoop fs ==hdfs dfs  
+
+在hdfs文件存储创建文件夹
+hadoop fs -mkdir /litianxiao  在hdfs根目录创建一个叫litianxiao的文件夹
+hadoop fs -mkdir -p /litianxiao/1/2      多层文件夹创建
+
+将本地文件上传到hdfs中
+hadoop fs -put ltxx.sql /litianxiao  将ltxx.sql上传到 /litianxiao目录中
+hadoop fs -put ltxx.sql 1.txt 2.txt /litianxiao  可以是多个文件上传
+
+将hdfs中的文件或者文件夹移动位置
+hadoop fs -mv /litianxiao/1/2 /      将2文件移到hdfs的根目录
+hadoop fs -mv /litianxiao/ltxx.sql /    将ltxx.sql移到hdfs的根目录
+
+
+在linux中查看hdfs目录
+
+hadoop fs -ls /                          查看hdfs的根目录
+hadoop fs -ls /litianxiao           查看hdfs的litianxiao目录下的东西
+
+在hdfs读取文件内容
+hadoop fs -cat /ltxx.sql           查看hdfs根目录下的ltxx.sql的内容
+
+将文件追加到hdfs的文件中
+touch 1.txt 
+hdfs dfs -put 1.txt /
+hdfs dfs -appendToFile 1.txt /1.txt
+hadoop fs -cat /1.txt
+
+删除hdfs中的文件或者文件夹
+
+hadoop fs -rm /1.txt
+hadoop fs -rmr /litianxiao/2
+删除之后会发现hdfs存在一个root目录 会发现这里存着删除的文件 
+
+将hdfs中的文件和文件夹拉回到本地
+
+hadoop fs -get /ltxx.sql ./               这个./表示当前linux当前所在路径
+hadoop fs -get /litianxiao ./

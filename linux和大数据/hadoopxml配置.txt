@@ -1,0 +1,193 @@
+core-site.xml
+//配置hadoop文件系统hdfs的端口
+    <property>
+        <name>fs.default.name</name>
+        <value>hdfs://bigdata:9000</value>
+    </property>
+//配置hadoop目录（这个目录要提前创建）
+
+<property>
+        <name>hadoop.tmp.dir</name>
+        <value>/opt/hadoop-2.9.2/current/tmp</value>
+    </property>
+//配置文件系统的垃圾清理（多长时间清理一次按分钟为单位）
+
+    
+    <property>
+        <name>fs.trash.interval</name>
+        <value>4320</value>
+    </property>
+
+hdfs-site.xml(伪分布式模式 datanode和namenode在同一台机器上）
+//配置namenode的存储位置（这个目录需要提前存在）
+<property>
+        <name>dfs.namenode.name.dir</name>
+        <value>/opt/hadoop-2.9.2/current/dfs/name</value>
+    </property>
+
+//配置datanode的存储位置（真正数据存放的位置，目录需要提前存在）
+ <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>/opt/hadoop-2.9.2/current/data</value>
+    </property>
+
+//配置hdfs每一个块有几个副本
+ <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+
+//配置hdfs是否启用web
+ <property>
+        <name>dfs.webhdfs.enabled</name>
+        <value>true</value>
+    </property>
+
+//配置hdfs的用户组
+<property>
+        <name>dfs.permissions.superusergroup</name>
+        <value>staff</value>
+    </property>
+
+//配置hdfs的权限（可以暂时不开启，防止文件读写权限受限制问题）
+<property>
+        <name>dfs.permissions.enabled</name>
+        <value>false</value>
+    </property>
+
+yarn-site.xml(需要配置很多的端口)
+//配置resourcemanager的运行主机地址
+ <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>bigdata</value>
+    </property>
+//配置nodemanager相关的东西
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+//配置nodemanager的MapReduce.shuffle那个类
+ <property>
+        <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+        <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+    </property>
+//配置resourcemanager的端口
+<property>
+        <name>yarn.resourcemanager.address</name>
+        <value>bigdata:18040</value>
+    </property>
+//配置resourcemanager调度器的端口
+  <property>
+        <name>yarn.resourcemanager.scheduler.address</name>
+        <value>bigdata:18030</value>
+    </property>
+//配置resourcemanager tracker的端口
+    <property>
+        <name>yarn.resourcemanager.resource-tracker.address</name>
+        <value>bigdata:18025</value>
+    </property>
+//配置resourcemanager admin的端口
+    <property>
+        <name>yarn.resourcemanager.admin.address</name>
+        <value>bigdata:18141</value>
+    </property>
+//配置resourcemanager webapp的端口
+   <property>
+        <name>yarn.resourcemanager.webapp.address</name>
+        <value>bigdata:18088</value>
+    </property>
+//配置aggregation日志
+ <property>
+        <name>yarn.log-aggregation-enable</name>
+        <value>true</value>
+    </property>
+//配置aggregation日志保留时间（秒为单位）
+    <property>
+        <name>yarn.log-aggregation.retain-seconds</name>
+        <value>86400</value>
+    </property>
+//配置aggregation多长时间检查一次（秒为单位）
+  <property>
+        <name>yarn.log-aggregation.retain-check-interval-seconds</name>
+        <value>86400</value>
+    </property>
+//配置nodemanager相关的东西将他配置到hdfs上去
+
+  
+    <property>
+        <name>yarn.nodemanager.remote-app-log-dir</name>
+        <value>/tmp/logs</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.remote-app-log-dir-suffix</name>
+        <value>logs</value>
+    </property>
+
+mapreduce-site.xml
+//配置mapreduce基于yarn框架
+ <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+//配置jobtracker通信的端口
+  <property>
+        <name>mapreduce.jobtracker.http.address</name>
+        <value>bigdata:50030</value>
+    </property>
+//配置jobhisotry作业历史记录端口
+<property>
+        <name>mapreduce.jobhistory.address</name>
+        <value>bigdata:10020</value>
+    </property>
+    <property>
+        <name>mapreduce.jobhistory.webapp.address</name>
+        <value>bigdata:19888</value>
+    </property>
+//配置jobhisotry已经完成的日志目录
+<property>
+        <name>mapreduce.jobhistory.done-dir</name>
+        <value>/jobhistory/done</value>
+    </property>
+//配置intermediate中间记录
+    <property>
+        <name>mapreduce.intermediate-done-dir</name>
+        <value>/jobhistory/done_intermediate</value>
+    </property>
+//配置开启ubertask
+<property>
+        <name>mapreduce.job.ubertask.enable</name>
+        <value>true</value>
+    </property>
+配置 slaves
+    nodemanager运行的主机名
+配置 hadoop-env.sh  将javahome改为其真实地址/home/javaJDK8/jdk1.8.0_251
+
+格式化hdfs
+cd ~
+  hdfs namenode -format
+
+//启动hadoop集群
+找到hadoop2.9.2下的sbin下的start-all.sh 启动
+
+//验证是否启动
+jsp
+应该有 namenode  datanode resourcemanager nodemanager
+           http://bigdata:50070/
+http://bigdata:18088/
+    
+    
+
+    
+   
+    
+  
+
+
+ 
+
+
+
+
+
+
+

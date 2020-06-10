@@ -1,0 +1,179 @@
+git 账户密码：843679400@qq.com
+                      litianxiao0607..
+
+reboot 重启虚拟机
+
+netstat -anp | grep "程序名字或者端口名"
+1.netstat -a 列出所有端口
+
+netstat -a 是列出所有的端口情况，包括监听的没有监听的。端口还分为tcp端口和udp端口，如果要想区分tcp端口和udp端口，可以使用“netstat -at”来列出tcp端口，用“netstat -ap”来列出udp端口。使用命令“netstat -anp”查看哪些端口被打开。
+
+2.查看一个端口是否被打开
+
+使用命令“nc -lp 23”可以打开23端口，使用命令“netstat -an | grep 23”可以查看23端口是否被打开。
+
+3.显示监听的端口
+
+使用命令“netstat -l”可以显示已经监听的端口。
+
+4.显示PID和进程名称“netstat -pt”
+
+5.显示核心路由“netstat -rn”
+
+6.查看指定程序的端口
+
+在命令行中输入“netstat -apn | grep ssh”可以查看ssh的端口。
+
+vm中的linux开机黑屏
+netsh winsock reset 
+linux ip address 显示ens33
+cmd--service.msc--打开vm dhcp 和 NAT服务
+
+linux解压
+yum install -y unzip zip  下载解压插件
+unzip xxx.zip
+
+关闭防火墙（重启失效）
+systemctl stop firewalld.service
+
+超级管理员密码：litianxiao
+
+
+创建一个文件完成写入内容 修改 保存文件 退出操作；
+先创建文件           touch xxx.txt
+查看文件               vi       xxx.txt
+编辑文件               按下键盘按键a/o/i  这是下方会有insert提示
+保存文件              （先按esc退出编辑模式再按住Shift键随便加个字母按键进入 命令模式）   w保存（不会退出） 
+退出文件              wq（保存退出）  wq!（强制保存退出） q!（单纯退出不保存） 
+回到编辑前状态    e!
+继续编辑              vi      
+
+
+完成一个文件夹创立到删除的过程
+创建一个名叫test文件夹          mkdir  test
+删除文件             rm  xxx.txt
+删除文件夹          rm -rf test
+
+如果出现 ping  www.baidu.com 没完没了的刷屏  尝试crtl+c 中断任务
+crtl + Z 暂停任务  恢复任务fg
+
+
+将一个文件夹或者文件复制或者移动到另外一个文件夹
+cp -r xx.txt /home/test   将一个xx.txt的文件复制到/home/test中
+cp xx xxx xxxx /home     将xx xxx xxxx这三个文件复制到/home中
+mv  xx.txt   /home/test   将一个xx.txt的文件移动到/home/test中（也可以移动文件夹）
+
+linux查看软件安装在哪里
+find / -name docker   //查看docker安装在哪里
+
+
+防火墙问题
+一、防火墙的状态。有时打开防火墙外部不能访问。
+防火墙的命令：
+查看防火墙状态 systemctl status firewalld
+开启防火墙 systemctl start firewalld
+关闭防火墙 systemctl stop firewalld
+开启防火墙 service firewalld start
+禁止开机启动防火墙 systemctl disable firewalld.service
+先用：systemctl unmask firewalld.service
+然后：systemctl start firewalld.service
+二、查看你的服务的端口号是否对外开放。
+命令：
+1.查询已经对外开放的端口
+netstat -anp
+2.查询指定端口是否已经开放
+firewall-cmd --query-port=3306/tcp
+返回yes/no。此时也有可能返回firewalld is not running，此时需要打开防火墙在开放端口。
+开放端口号命令：
+添加指定需要开放的端口：
+firewall-cmd --add-port=3306/tcp --permanent
+重载入添加的端口：
+firewall-cmd --reload
+查询指定端口是否开启成功：
+firewall-cmd --query-port=3306/tcp
+注：移除指定端口：
+	firewall-cmd --permanent --remove-port=3306/tcp
+
+
+linux解决包冲突问题  针对于 yum方式
+方式一： yum -y install glibc.i686 libstdc++.i686 libcurl4-gnutls-dev.i686 libcurl.i686 --setopt=protected_multilib=false  //加入--setopt=protected_multilib=false（忽略参数）
+报错：Transaction check error:
+  file /usr/share/gcc-4.8.2/python/libstdcxx/v6/printers.pyc from install of libstdc++-4.8.5-39.el7.i686 conflicts with file from package libstdc++-4.8.5-36.el7.x86_64
+  file /usr/share/gcc-4.8.2/python/libstdcxx/v6/printers.pyo from install of libstdc++-4.8.5-39.el7.i686 conflicts with file from package libstdc++-4.8.5-36.el7.x86_64
+
+
+方拾二：yum update libstdc++-4.8.5-36.el7.x86_64  
+然后输入   
+yum -y install glibc.i686 libstdc++.i686 libcurl4-gnutls-dev.i686 libcurl.i686   就可以安装成功
+
+
+
+1.从linux本机文件上传到另一台linux
+格式：
+scp 要传的文件 root@目标ip:路径
+scp –r 要传的目录 root@目标ip:路径
+
+例子：
+ scp  /root/1.txt   root@192.168.3.1:/root                 # 上传文件 
+ scp  -r  /root/data   root@192.168.3.1:/root              #上传目录
+
+ 
+
+2.从linux下载文件到linux本机：
+格式：
+scp root@192.168.3.1:/root/data /root
+scp命令用户名@目标IP地址：文件路径本地位置
+
+例子：
+scp  root@192.168.3.1:/root/1.txt   /root                 #下载文件
+ scp  -r  root@192.192.3.1:/root/data   /root            #下载目录
+
+docker命令
+账户密码 15297600508   litianxiao
+
+//配置镜像加速器 docker官方仓库在国外一般拉取很慢 需要通过镜像加速去提速
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://hvmf8r55.mirror.aliyuncs.com"]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+//查看镜像加速器是否生效
+tail /etc/docker/daemon.json
+
+查找镜像
+docker search xxx   （通过xxx在docker官方仓库查找带xxx的镜像）
+//拉取仓库镜像到本地
+docker pull  xxx （执行这个命令需要去docker官网查看对应镜像的版本号）
+//运行容器
+docker run -dit --privileged -p21:21 -p80:80 -p8080:8080 -p30000-30010:30000-30010 --name how2jtmall how2j/tmall:latest /usr/sbin/init
+                   -dit是 -d -i -t 的缩写。 -d ，表示 detach，即在后台运行。 -i 表示提供交互接口，这样才可以通过 docker 和 跑起来的操作系统交互。 -t 表示提供一个 tty (伪终端)，与 -i 配合就可以通过 ssh 工具连接到 这个容器里面去了
+                   --privileged 启动容器的时候吧权限带进去这样才能在容器内进行完整操作
+                   -p80:80  表示第一个80表示开放本机centos端口80  第二个表示开放容器内的80端口 这样访问本机80就可间接访问容器内的80端口了
+                   --name  给容器起个名字方便后续管理
+                   how2j/tmall:latest how2j/tmall 就是镜像的名称， latest是版本号，即最新版本
+                   /usr/sbin/init 表示启动后运行的程序，即通过这个命令做初始化
+//进入容器
+docker exec -it how2jtmall /bin/bash   进入这个linux
+//退出容器    exit
+//查看本地镜像   docker images
+//删除本地镜像   docker rmi how2j/tmall
+将容器转为镜像  docker commit how2jtmall how2j/tmall:now
+
+容器的停止 docker stop how2jtmall
+容器的开始 docker start how2jtmall
+容器的暂停 docker pause how2jtmall
+容器的恢复 docker unpause how2jtmall
+
+查看所有容器 docker ps -a
+查看当前运行的容器或者暂定的容器 docker ps  
+删除容器  docker rm how2jtmall
+删除所有容器 docker rm `docker ps -a -q` -f
+
+
+
+
+
+
